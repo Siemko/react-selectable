@@ -35,8 +35,8 @@ const coordsCollide = (aTop, aLeft, bTop, bLeft, aWidth, aHeight, bWidth, bHeigh
  * @return {bool}
  */
 export default (a, b, tolerance = 0) => {
-	const aObj = (a instanceof HTMLElement) ? getBoundsForNode(a) : a;
-	const bObj = (b instanceof HTMLElement) ? getBoundsForNode(b) : b;
+	const aObj = (a instanceof HTMLElement || a instanceof SVGElement) ? getBoundsForNode(a) : a;
+	const bObj = (b instanceof HTMLElement || b instanceof SVGElement) ? getBoundsForNode(b) : b;
 
 	return coordsCollide(
 		aObj.top,
