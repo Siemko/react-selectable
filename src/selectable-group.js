@@ -77,22 +77,21 @@ class SelectableGroup extends Component {
    * of the selection box
    */
   _openSelector(e) {
-    const w = Math.abs(this._mouseDownData.initialW - e.pageX + this._rect.x);
-    const h = Math.abs(this._mouseDownData.initialH - e.pageY + this._rect.y);
+    const w = Math.abs(
+      this._mouseDownData.initialW - (e.clientX - this._rect.x)
+    );
+    const h = Math.abs(
+      this._mouseDownData.initialH - (e.clientY - this._rect.y)
+    );
 
     this.setState({
       isBoxSelecting: true,
       boxWidth: w,
       boxHeight: h,
       boxLeft:
-        Math.min(e.pageX - this._rect.x, this._mouseDownData.initialW) -
+        Math.min(e.clientX - this._rect.x, this._mouseDownData.initialW) -
         this.props.leftOffset,
-      boxTop:
-        Math.min(e.pageY - this._rect.y, this._mouseDownData.initialH) -
-        document
-          .getElementById(this.props.containerSelector)
-          .getClientRects()[0].top +
-        document.getElementById(this.props.containerSelector).scrollTop,
+      boxTop: Math.min(e.clientY - this._rect.y, this._mouseDownData.initialH),
     });
 
     this._throttledSelect(e);
@@ -103,17 +102,10 @@ class SelectableGroup extends Component {
       return { x: 0, y: 0 };
     }
 
-    const style = window.getComputedStyle(document.body);
-    const t = style.getPropertyValue("margin-top");
-    const l = style.getPropertyValue("margin-left");
-    const mLeft = parseInt(l.slice(0, l.length - 2), 10);
-    const mTop = parseInt(t.slice(0, t.length - 2), 10);
-
-    const bodyRect = document.body.getBoundingClientRect();
     const elemRect = findDOMNode(this).getBoundingClientRect();
     return {
-      x: Math.round(elemRect.left - bodyRect.left + mLeft),
-      y: Math.round(elemRect.top - bodyRect.top + mTop),
+      x: Math.round(elemRect.left),
+      y: Math.round(elemRect.top),
     };
   }
 
@@ -166,10 +158,10 @@ class SelectableGroup extends Component {
     this._rect = this._getInitialCoordinates();
 
     this._mouseDownData = {
-      boxLeft: e.pageX - this._rect.x,
-      boxTop: e.pageY - this._rect.y,
-      initialW: e.pageX - this._rect.x,
-      initialH: e.pageY - this._rect.y,
+      boxLeft: e.clientX - this._rect.x,
+      boxTop: e.clientY - this._rect.y,
+      initialW: e.clientX - this._rect.x,
+      initialH: e.clientY - this._rect.y,
     };
 
     if (preventDefault) e.preventDefault();
@@ -274,6 +266,8 @@ class SelectableGroup extends Component {
       position: "relative",
       overflow: "visible",
     };
+
+    console.log(this._registry)
 
     return (
       <Component

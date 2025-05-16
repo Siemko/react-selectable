@@ -73,7 +73,7 @@ class App extends React.Component {
 
 	render () {
 		return (
-			<div>
+			<div id="main" style={{ height: "100%" }}>
 				<h1>React Selectable Demo</h1>
 				<div className="sidebar">
 					<div className="info">						
@@ -100,6 +100,7 @@ class App extends React.Component {
 					</div>
 				</div>
 				<SelectableGroup
+					containerSelector="main"
 					className="main" 
 					ref="selectable"
 					onSelection={this.handleSelection} 

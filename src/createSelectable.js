@@ -1,39 +1,41 @@
-import React from 'react';
-import {findDOMNode} from 'react-dom';
-import PropTypes from 'prop-types';
+import React from "react";
+import { findDOMNode } from "react-dom";
+import PropTypes from "prop-types";
 
 const createSelectable = (WrappedComponent) => {
-	class SelectableItem extends React.Component {
+  class SelectableItem extends React.Component {
+    componentDidMount() {
+      this.context.selectable.register(
+        this.props.selectableKey,
+        findDOMNode(this)
+      );
+    }
 
-		componentDidMount () {
-			this.context.selectable.register(this.props.selectableKey, findDOMNode(this));
-		}
+    componentWillUnmount() {
+      this.context.selectable.unregister(this.props.selectableKey);
+    }
 
+    render() {
+      return (
+        <div id={"selectableItem-" + this.props.selectableKey}>
+          <WrappedComponent {...this.props}>
+            {this.props.children}
+          </WrappedComponent>
+        </div>
+      );
+    }
+  }
 
-		componentWillUnmount () {
-			this.context.selectable.unregister(this.props.selectableKey);
-		}
+  SelectableItem.contextTypes = {
+    selectable: PropTypes.object,
+  };
 
+  SelectableItem.propTypes = {
+    children: PropTypes.node,
+    selectableKey: PropTypes.any.isRequired,
+  };
 
-		render () {
-          return <div id={"selectableItem-"+this.props.selectableKey}>
-            <WrappedComponent {...this.props}>
-              {this.props.children}
-            </WrappedComponent>
-          </div>
-		}
-	}
-
-	SelectableItem.contextTypes = {
-		selectable: PropTypes.object
-	};
-
-	SelectableItem.propTypes = {
-		children: PropTypes.node,
-		selectableKey: PropTypes.any.isRequired
-	};
-
-	return SelectableItem;
+  return SelectableItem;
 };
 
 export default createSelectable;

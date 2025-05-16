@@ -1,11 +1,11 @@
 {
   "name": "react-selectable",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "",
   "main": "dist/react-selectable.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/unclecheese/react-selectable.git"
+    "url": "git://github.com/Siemko/react-selectable.git"
   },
   "scripts": {
     "build": "NODE_ENV=production node node_modules/webpack/bin/webpack",
@@ -13,7 +13,6 @@
     "example": "node node_modules/webpack/bin/webpack --config webpack.config.example.js",
     "watch": "NODE_ENV=development node node_modules/webpack/bin/webpack --watch"
   },
-  "homepage": "http://unclecheese.github.io/react-selectable",
   "keywords": [
     "selectable",
     "selection",
@@ -24,7 +23,7 @@
   "author": "Uncle Cheese",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/unclecheese/react-selectable/issues"
+    "url": "https://github.com/Siemko/react-selectable/issues"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
