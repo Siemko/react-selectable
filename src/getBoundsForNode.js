@@ -6,10 +6,21 @@
 export default (node) => {
   const rect = node.getBoundingClientRect();
 
-  return {
-    top: rect.top + window.pageYOffset,
-    left: rect.left + window.pageXOffset,
-    offsetWidth: rect.width,
-    offsetHeight: rect.height,
+  let realHeight = rect.height;
+  let realWidth = rect.width;
+
+  const child = node.firstElementChild;
+  const childBox = child.getBoundingClientRect();
+  if (child && (childBox.height < realHeight || childBox.width < realWidth)) {
+    realHeight = childBox.height;
+    realWidth = childBox.width;
+  }
+
+  const box = {
+    top: childBox.top + window.pageYOffset,
+    left: childBox.left + window.pageXOffset,
+    width: realWidth,
+    height: realHeight,
   };
+  return box;
 };

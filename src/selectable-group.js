@@ -267,8 +267,6 @@ class SelectableGroup extends Component {
       overflow: "visible",
     };
 
-    console.log(this._registry)
-
     return (
       <Component
         className={cx(className, isBoxSelecting ? selectingClassName : null)}
