@@ -7,9 +7,9 @@ export default (node) => {
   const rect = node.getBoundingClientRect();
 
   return {
-    top: rect.top + document.body.scrollTop,
-    left: rect.left + document.body.scrollLeft,
-    offsetWidth: rect.offsetWidth,
-    offsetHeight: rect.offsetHeight,
+    top: rect.top + window.pageYOffset,
+    left: rect.left + window.pageXOffset,
+    offsetWidth: rect.width,
+    offsetHeight: rect.height,
   };
 };
