@@ -17,11 +17,9 @@ const createSelectable = (WrappedComponent) => {
 
     render() {
       return (
-        <div id={"selectableItem-" + this.props.selectableKey}>
           <WrappedComponent {...this.props}>
             {this.props.children}
           </WrappedComponent>
-        </div>
       );
     }
   }
