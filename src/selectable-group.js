@@ -77,20 +77,14 @@ class SelectableGroup extends Component {
    * of the selection box
    */
   _openSelector(e) {
-    const w = Math.abs(
-      this._mouseDownData.initialW - (e.clientX - this._rect.x)
-    );
-    const h = Math.abs(
-      this._mouseDownData.initialH - (e.clientY - this._rect.y)
-    );
+    const w = Math.abs(this._mouseDownData.initialW - e.clientX + this._rect.x);
+    const h = Math.abs(this._mouseDownData.initialH - e.clientY + this._rect.y);
 
     this.setState({
       isBoxSelecting: true,
       boxWidth: w,
       boxHeight: h,
-      boxLeft:
-        Math.min(e.clientX - this._rect.x, this._mouseDownData.initialW) -
-        this.props.leftOffset,
+      boxLeft: Math.min(e.clientX - this._rect.x, this._mouseDownData.initialW),
       boxTop: Math.min(e.clientY - this._rect.y, this._mouseDownData.initialH),
     });
 
@@ -102,10 +96,17 @@ class SelectableGroup extends Component {
       return { x: 0, y: 0 };
     }
 
+    const style = window.getComputedStyle(document.body);
+    const t = style.getPropertyValue("margin-top");
+    const l = style.getPropertyValue("margin-left");
+    const mLeft = parseInt(l.slice(0, l.length - 2), 10);
+    const mTop = parseInt(t.slice(0, t.length - 2), 10);
+
+    const bodyRect = document.body.getBoundingClientRect();
     const elemRect = findDOMNode(this).getBoundingClientRect();
     return {
-      x: Math.round(elemRect.left),
-      y: Math.round(elemRect.top),
+      x: Math.round(elemRect.left - bodyRect.left + mLeft),
+      y: Math.round(elemRect.top - bodyRect.top + mTop),
     };
   }
 
@@ -147,8 +148,8 @@ class SelectableGroup extends Component {
           right: offsetData.offsetWidth,
         },
         {
-          top: e.pageY - this._rect.y,
-          left: e.pageX - this._rect.x,
+          top: e.clientY - this._rect.y,
+          left: e.clientX - this._rect.x,
           offsetWidth: 0,
           offsetHeight: 0,
         }
@@ -384,7 +385,6 @@ SelectableGroup.defaultProps = {
   fixedPosition: false,
   preventDefault: true,
   enabled: true,
-  leftOffset: 0,
 };
 
 SelectableGroup.childContextTypes = {

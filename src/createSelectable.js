@@ -17,9 +17,9 @@ const createSelectable = (WrappedComponent) => {
 
     render() {
       return (
-          <WrappedComponent {...this.props}>
-            {this.props.children}
-          </WrappedComponent>
+        <WrappedComponent {...this.props}>
+          {this.props.children}
+        </WrappedComponent>
       );
     }
   }
