@@ -95,18 +95,11 @@ class SelectableGroup extends Component {
     if (this.props.fixedPosition) {
       return { x: 0, y: 0 };
     }
-
-    const style = window.getComputedStyle(document.body);
-    const t = style.getPropertyValue("margin-top");
-    const l = style.getPropertyValue("margin-left");
-    const mLeft = parseInt(l.slice(0, l.length - 2), 10);
-    const mTop = parseInt(t.slice(0, t.length - 2), 10);
-
-    const bodyRect = document.body.getBoundingClientRect();
+    
     const elemRect = findDOMNode(this).getBoundingClientRect();
     return {
-      x: Math.round(elemRect.left - bodyRect.left + mLeft),
-      y: Math.round(elemRect.top - bodyRect.top + mTop),
+      x: Math.round(elemRect.left),
+      y: Math.round(elemRect.top),
     };
   }
 
