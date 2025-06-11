@@ -1,6 +1,6 @@
 {
   "name": "react-selectable",
-  "version": "3.0.5",
+  "version": "3.1.0",
   "description": "",
   "main": "dist/react-selectable.js",
   "repository": {
@@ -34,8 +34,8 @@
     "classnames": "^2.2.5",
     "lodash.throttle": "^4.1.1",
     "prop-types": "^15.6.0",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0",
+    "react": "^16",
+    "react-dom": "^16",
     "webpack": "^3.8.1"
   }
 }

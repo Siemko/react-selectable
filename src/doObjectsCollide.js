@@ -2,16 +2,16 @@ import getBoundsForNode from "./getBoundsForNode";
 
 /**
  * Given offsets, widths, and heights of two objects, determine if they collide (overlap).
- * @param  {int} aTop        The top position of the first object
- * @param  {int} aLeft       The left position of the first object
- * @param  {int} bTop        The top position of the second object
- * @param  {int} bLeft       The left position of the second object
- * @param  {int} aWidth      The width of the first object
- * @param  {int} aHeight     The height of the first object
- * @param  {int} bWidth      The width of the second object
- * @param  {int} bHeight     The height of the second object
- * @param  {int} tolerance   Amount of forgiveness an item will offer to the selectbox before registering a selection
- * @return {bool}
+ * @param  {number} aTop        The top position of the first object
+ * @param  {number} aLeft       The left position of the first object
+ * @param  {number} bTop        The top position of the second object
+ * @param  {number} bLeft       The left position of the second object
+ * @param  {number} aWidth      The width of the first object
+ * @param  {number} aHeight     The height of the first object
+ * @param  {number} bWidth      The width of the second object
+ * @param  {number} bHeight     The height of the second object
+ * @param  {number} tolerance   Amount of forgiveness an item will offer to the selectbox before registering a selection
+ * @return {boolean}
  */
 const coordsCollide = (
   aTop,
@@ -24,37 +24,62 @@ const coordsCollide = (
   bHeight,
   tolerance
 ) => {
+  // Ensure all values are numbers
+  const numericTolerance = Number(tolerance) || 0;
+
   return !(
     // 'a' bottom doesn't touch 'b' top
     (
-      aTop + aHeight - tolerance < bTop ||
+      aTop + aHeight - numericTolerance < bTop ||
       // 'a' top doesn't touch 'b' bottom
-      aTop + tolerance > bTop + bHeight ||
+      aTop + numericTolerance > bTop + bHeight ||
       // 'a' right doesn't touch 'b' left
-      aLeft + aWidth - tolerance < bLeft ||
+      aLeft + aWidth - numericTolerance < bLeft ||
       // 'a' left doesn't touch 'b' right
-      aLeft + tolerance > bLeft + bWidth
+      aLeft + numericTolerance > bLeft + bWidth
     )
   );
 };
 
 /**
- * Given two objects containing "top", "left", "offsetWidth" and "offsetHeight"
+ * Given two objects containing "top", "left", "width" and "height"
  * properties, determine if they collide.
  * @param  {Object|HTMLElement} a
  * @param  {Object|HTMLElement} b
- * @param  {int} tolerance
- * @return {bool}
+ * @param  {number} tolerance
+ * @return {boolean}
  */
 export default (a, b, tolerance = 0) => {
-  const aObj =
-    a instanceof HTMLElement || a instanceof SVGElement
-      ? getBoundsForNode(a)
-      : a;
-  const bObj =
-    b instanceof HTMLElement || b instanceof SVGElement
-      ? getBoundsForNode(b)
-      : b;
+  if (!a || !b) {
+    return false;
+  }
+
+  let aObj, bObj;
+
+  // Handle HTMLElement/SVGElement
+  if (a instanceof HTMLElement || a instanceof SVGElement) {
+    aObj = getBoundsForNode(a);
+  } else {
+    // Handle plain objects - normalize property names
+    aObj = {
+      top: a.top || 0,
+      left: a.left || 0,
+      width: a.width || a.offsetWidth || 0,
+      height: a.height || a.offsetHeight || 0,
+    };
+  }
+
+  if (b instanceof HTMLElement || b instanceof SVGElement) {
+    bObj = getBoundsForNode(b);
+  } else {
+    // Handle plain objects - normalize property names
+    bObj = {
+      top: b.top || 0,
+      left: b.left || 0,
+      width: b.width || b.offsetWidth || 0,
+      height: b.height || b.offsetHeight || 0,
+    };
+  }
 
   return coordsCollide(
     aObj.top,

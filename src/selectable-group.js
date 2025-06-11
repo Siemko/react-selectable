@@ -51,11 +51,14 @@ class SelectableGroup extends Component {
    */
   componentWillUnmount() {
     this._applyMousedown(false);
+    if (this._throttledSelect && this._throttledSelect.cancel) {
+      this._throttledSelect.cancel();
+    }
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.enabled !== this.props.enabled) {
-      this._applyMousedown(nextProps.enabled);
+  componentDidUpdate(prevProps) {
+    if (prevProps.enabled !== this.props.enabled) {
+      this._applyMousedown(this.props.enabled);
     }
   }
 
@@ -95,7 +98,7 @@ class SelectableGroup extends Component {
     if (this.props.fixedPosition) {
       return { x: 0, y: 0 };
     }
-    
+
     const elemRect = findDOMNode(this).getBoundingClientRect();
     return {
       x: Math.round(elemRect.left),
@@ -172,9 +175,6 @@ class SelectableGroup extends Component {
 
     e.stopPropagation();
 
-    window.removeEventListener("mousemove", this._openSelector);
-    window.removeEventListener("mouseup", this._mouseUp);
-
     if (!this._mouseDownData) return;
 
     // Mouse up when not box selecting is a heuristic for a "click"
@@ -194,6 +194,9 @@ class SelectableGroup extends Component {
       boxWidth: 0,
       boxHeight: 0,
     });
+
+    window.removeEventListener("mousemove", this._openSelector);
+    window.removeEventListener("mouseup", this._mouseUp);
   }
 
   /**
@@ -201,7 +204,6 @@ class SelectableGroup extends Component {
    */
   _selectElements(e, isEnd = false) {
     const { tolerance, onSelection, onEndSelection } = this.props;
-
     const currentItems = [];
     const _selectbox = findDOMNode(this.refs.selectbox);
 
@@ -218,9 +220,13 @@ class SelectableGroup extends Component {
     });
 
     if (isEnd) {
-      if (typeof onEndSelection === "function") onEndSelection(currentItems, e);
+      if (typeof onEndSelection === "function") {
+        onEndSelection(currentItems, e);
+      }
     } else {
-      if (typeof onSelection === "function") onSelection(currentItems, e);
+      if (typeof onSelection === "function") {
+        onSelection(currentItems, e);
+      }
     }
   }
 
@@ -246,6 +252,7 @@ class SelectableGroup extends Component {
       zIndex: 9000,
       position: fixedPosition ? "fixed" : "absolute",
       cursor: "default",
+      pointerEvents: "none",
     };
 
     const spanStyle = {
