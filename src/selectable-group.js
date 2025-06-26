@@ -80,8 +80,14 @@ class SelectableGroup extends Component {
    * of the selection box
    */
   _openSelector(e) {
+    const { onBeginDrag } = this.props;
+    const { isBoxSelecting } = this.state;
     const w = Math.abs(this._mouseDownData.initialW - e.clientX + this._rect.x);
     const h = Math.abs(this._mouseDownData.initialH - e.clientY + this._rect.y);
+
+    if (onBeginDrag && typeof onBeginDrag === "function" && !isBoxSelecting) {
+      onBeginDrag(e);
+    }
 
     this.setState({
       isBoxSelecting: true,
@@ -377,6 +383,13 @@ SelectableGroup.propTypes = {
    * @type {string}
    */
   selectingClassName: PropTypes.string,
+
+  /**
+   * Event that will fire when the selection box is being dragged
+   * @type {Function}
+   * @param {MouseEvent} event - MouseEvent
+   */
+  onBeginDrag: PropTypes.func,
 };
 
 SelectableGroup.defaultProps = {

@@ -105,6 +105,9 @@ class App extends React.Component {
 					ref="selectable"
 					onSelection={this.handleSelection} 
 					tolerance={this.state.tolerance}
+					onBeginDrag={(e) => {
+						console.log("onBeginDrag", e);
+					}}
 					selectOnMouseMove={this.state.selectOnMouseMove}>
 				
 				{this.props.items.map((item, i) => {
