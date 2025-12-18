@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { SelectableGroup, createSelectable } from 'react-selectable';
 import Album from './Album';
 
@@ -24,7 +24,9 @@ class App extends React.Component {
 			selectedItems: [],
 			tolerance: 0,
 			selectOnMouseMove: false,
-		}
+		};
+
+		this.selectableRef = createRef();
 
 		this.handleSelection = this.handleSelection.bind(this);
 		this.clearItems = this.clearItems.bind(this);
@@ -51,7 +53,7 @@ class App extends React.Component {
 
 
 	clearItems (e) {
-		if(!isNodeInRoot(e.target, this.refs.selectable)) {
+		if(this.selectableRef.current && !isNodeInRoot(e.target, this.selectableRef.current)) {
 			this.setState({
 				selectedItems: []
 			});
@@ -82,7 +84,7 @@ class App extends React.Component {
 						<p><input type="range" min="0" max="50" step="1" onChange={this.handleToleranceChange} value={this.state.tolerance} /></p>
 
 						<label>
-							<input type="checkbox" value={this.state.selectOnMouseMove} onChange={this.toggleSelectOnMouseMove} />
+							<input type="checkbox" checked={this.state.selectOnMouseMove} onChange={this.toggleSelectOnMouseMove} />
 							Select on mouse move
 						</label>
 
@@ -93,35 +95,35 @@ class App extends React.Component {
 							<p>Please select some items from the right by clicking and dragging a box around them.</p>
 						}
 						<ul>
-						{this.state.selectedItems.map(function (key,i) {
-							return <li key={i}>{this.props.items[key].title}</li>
-						}.bind(this))}
+						{this.state.selectedItems.map((key, i) => (
+							<li key={i}>{this.props.items[key].title}</li>
+						))}
 						</ul>
 					</div>
 				</div>
-				<SelectableGroup
-					containerSelector="main"
-					className="main" 
-					ref="selectable"
-					onSelection={this.handleSelection} 
-					tolerance={this.state.tolerance}
-					onBeginDrag={(e) => {
-						console.log("onBeginDrag", e);
-					}}
-					selectOnMouseMove={this.state.selectOnMouseMove}>
-				
-				{this.props.items.map((item, i) => {
-					const selected = this.state.selectedItems.indexOf(i) > -1;
-					return (
-						<SelectableAlbum
-							selectableKey={i}
-							key={i} 
-							title={item.title} 
-							year={item.year} 
-							selected={selected} />
-					);
-				})}
-				</SelectableGroup>
+				<div ref={this.selectableRef}>
+					<SelectableGroup
+						className="main" 
+						onSelection={this.handleSelection} 
+						onEndSelection={this.handleSelection}
+						tolerance={this.state.tolerance}
+						onBeginDrag={(e) => {
+							console.log("onBeginDrag", e);
+						}}>
+					
+					{this.props.items.map((item, i) => {
+						const selected = this.state.selectedItems.indexOf(i) > -1;
+						return (
+							<SelectableAlbum
+								selectableKey={i}
+								key={i} 
+								title={item.title} 
+								year={item.year} 
+								selected={selected} />
+						);
+					})}
+					</SelectableGroup>
+				</div>
 			</div>
 
 		);		
