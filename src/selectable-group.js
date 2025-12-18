@@ -1,7 +1,7 @@
-import React, { Component, createRef } from "react";
+import React, { Component } from "react";
+import { findDOMNode } from "react-dom";
 import PropTypes from "prop-types";
 import cx from "classnames";
-import SelectableContext from "./SelectableContext";
 import isNodeInRoot from "./nodeInRoot";
 import isNodeIn from "./isNodeIn";
 import getBoundsForNode from "./getBoundsForNode";
@@ -22,10 +22,6 @@ class SelectableGroup extends Component {
     this._rect = null;
     this._registry = [];
 
-    // Create refs instead of using findDOMNode
-    this._containerRef = createRef();
-    this._selectboxRef = createRef();
-
     this._openSelector = this._openSelector.bind(this);
     this._mouseDown = this._mouseDown.bind(this);
     this._mouseUp = this._mouseUp.bind(this);
@@ -34,11 +30,14 @@ class SelectableGroup extends Component {
     this._unregisterSelectable = this._unregisterSelectable.bind(this);
 
     this._throttledSelect = throttle(this._selectElements, 50);
+  }
 
-    // Context value for children
-    this._contextValue = {
-      register: this._registerSelectable,
-      unregister: this._unregisterSelectable,
+  getChildContext() {
+    return {
+      selectable: {
+        register: this._registerSelectable,
+        unregister: this._unregisterSelectable,
+      },
     };
   }
 
@@ -72,11 +71,8 @@ class SelectableGroup extends Component {
   }
 
   _applyMousedown(apply) {
-    const node = this._containerRef.current;
-    if (!node) return;
-    
     const funcName = apply ? "addEventListener" : "removeEventListener";
-    node[funcName]("mousedown", this._mouseDown);
+    findDOMNode(this)[funcName]("mousedown", this._mouseDown);
   }
 
   /**
@@ -109,10 +105,7 @@ class SelectableGroup extends Component {
       return { x: 0, y: 0 };
     }
 
-    const node = this._containerRef.current;
-    if (!node) return { x: 0, y: 0 };
-    
-    const elemRect = node.getBoundingClientRect();
+    const elemRect = findDOMNode(this).getBoundingClientRect();
     return {
       x: Math.round(elemRect.left),
       y: Math.round(elemRect.top),
@@ -140,9 +133,7 @@ class SelectableGroup extends Component {
       return;
     }
 
-    const node = this._containerRef.current;
-    if (!node) return;
-    
+    const node = findDOMNode(this);
     let collides, offsetData;
     window.addEventListener("mouseup", this._mouseUp);
 
@@ -220,7 +211,7 @@ class SelectableGroup extends Component {
   _selectElements(e, isEnd = false) {
     const { tolerance, onSelection, onEndSelection } = this.props;
     const currentItems = [];
-    const _selectbox = this._selectboxRef.current;
+    const _selectbox = findDOMNode(this.refs.selectbox);
 
     if (!_selectbox) return;
 
@@ -256,13 +247,7 @@ class SelectableGroup extends Component {
     const Component = this.props.component;
 
     if (!enabled) {
-      return (
-        <Component className={className} ref={this._containerRef}>
-          <SelectableContext.Provider value={this._contextValue}>
-            {children}
-          </SelectableContext.Provider>
-        </Component>
-      );
+      return <Component className={className}>{children}</Component>;
     }
 
     const boxStyle = {
@@ -293,22 +278,24 @@ class SelectableGroup extends Component {
       <Component
         className={cx(className, isBoxSelecting ? selectingClassName : null)}
         style={wrapperStyle}
-        ref={this._containerRef}
       >
-        <SelectableContext.Provider value={this._contextValue}>
-          {isBoxSelecting ? (
-            <div style={boxStyle} ref={this._selectboxRef}>
-              <span style={spanStyle} />
-            </div>
-          ) : null}
-          {children}
-        </SelectableContext.Provider>
+        {isBoxSelecting ? (
+          <div style={boxStyle} ref="selectbox">
+            <span style={spanStyle} />
+          </div>
+        ) : null}
+        {children}
       </Component>
     );
   }
 }
 
 SelectableGroup.propTypes = {
+  /**
+   * @typedef {Object} MouseEvent
+   * @typedef {Object} HTMLElement
+   */
+
   /**
    * @type {HTMLElement} node
    */
@@ -343,9 +330,9 @@ SelectableGroup.propTypes = {
   /**
    * The component that will represent the Selectable DOM node
    *
-   * @type {string} tag name
+   * @type {HTMLElement} node
    */
-  component: PropTypes.string,
+  component: PropTypes.node,
 
   /**
    * Amount of forgiveness an item will offer to the selectbox before registering
@@ -381,7 +368,7 @@ SelectableGroup.propTypes = {
 
   /**
    * If false, all of the selectble features are turned off.
-   * @type {Boolean}
+   * @type {[type]}
    */
   enabled: PropTypes.bool,
 
@@ -411,6 +398,10 @@ SelectableGroup.defaultProps = {
   fixedPosition: false,
   preventDefault: true,
   enabled: true,
+};
+
+SelectableGroup.childContextTypes = {
+  selectable: PropTypes.object,
 };
 
 export default SelectableGroup;
